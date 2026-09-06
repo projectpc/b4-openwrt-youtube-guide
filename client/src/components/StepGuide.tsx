@@ -100,6 +100,59 @@ export function StepGuide() {
         </div>
       </div>
 
+      {/* Управление службой и пути установки */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="bg-card/70 border-cyan-500/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-display text-cyan-300 flex items-center gap-2">
+              <Terminal className="w-4 h-4" /> Управление службой b4
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-xs text-muted-foreground">Команды выполняются по SSH от имени <code>root</code>.</p>
+            <div className="relative bg-black/60 rounded-lg p-3 border border-border/80 font-mono text-[11px]">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="absolute right-2 top-2 h-6 px-2 text-xs text-cyan-400 hover:text-cyan-300"
+                onClick={() => copy("/etc/init.d/b4 enable     # автозапуск при загрузке\n/etc/init.d/b4 start\n/etc/init.d/b4 stop\n/etc/init.d/b4 restart\n/etc/init.d/b4 status\nlogread -e b4 | tail -50", "service-commands")}
+              >
+                {copiedId === "service-commands" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span className="ml-1">Копировать</span>
+              </Button>
+              <pre className="text-cyan-300 leading-6 pr-24 overflow-x-auto">{`/etc/init.d/b4 enable     # автозапуск при загрузке
+/etc/init.d/b4 start
+/etc/init.d/b4 stop
+/etc/init.d/b4 restart
+/etc/init.d/b4 status
+logread -e b4 | tail -50`}</pre>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/70 border-cyan-500/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-display text-cyan-300 flex items-center gap-2">
+              <Shield className="w-4 h-4" /> Пути установки
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto text-xs font-mono">
+              <table className="w-full">
+                <thead className="text-muted-foreground border-b border-border/60">
+                  <tr><th className="text-left py-2 pr-3">Хранилище</th><th className="text-left py-2 pr-3">Бинарник</th><th className="text-left py-2">Конфигурация</th></tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  <tr><td className="py-2 pr-3 text-emerald-300">/opt (extroot/USB)</td><td className="py-2 pr-3 text-cyan-300">/opt/bin/b4</td><td className="py-2 text-cyan-300">/opt/etc/b4/b4.json</td></tr>
+                  <tr><td className="py-2 pr-3 text-amber-300">Без /opt (fallback)</td><td className="py-2 pr-3 text-cyan-300">/usr/bin/b4</td><td className="py-2 text-cyan-300">/etc/b4/b4.json</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-3">Проверить фактический путь можно командами <code>command -v b4</code> и <code>ls -l /opt/bin/b4 /usr/bin/b4 2&gt;/dev/null</code>.</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Шаг 3: Настройка Flow Offload */}
       <div className="relative pl-8 border-l-2 border-cyan-500/40 space-y-3">
         <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-cyan-950 border-2 border-amber-400 flex items-center justify-center font-mono text-xs font-bold text-amber-300">
@@ -136,7 +189,26 @@ export function StepGuide() {
             sysctl -w net.netfilter.nf_conntrack_acct=1 && cp -a /usr/share/firewall4/templates/ruleset.uc /root/ruleset.uc.before-b4 && sed -i 's/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart
           </pre>
           <div className="text-[11px] text-muted-foreground pt-1">
-            Перед запуском проверьте <code>fw4 print | grep -E 'flowtable|flow offload|original packets'</code>. Команда включает conntrack accounting, сохраняет резервную копию, проверяет синтаксис и перезапускает firewall. Для отката: <code>cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart</code>. После применения проверьте <code>nft list chain inet fw4 forward | grep -E 'flow offload|original packets'</code>.
+            Перед запуском проверьте <code>fw4 print | grep -E 'flowtable|flow offload|original packets'</code>. Патч включает conntrack accounting, сохраняет резервную копию, проверяет синтаксис и перезапускает firewall. После применения проверьте <code>nft list chain inet fw4 forward | grep -E 'flow offload|original packets'</code>.
+          </div>
+
+          <div className="mt-3 rounded-lg border-2 border-red-500/70 bg-red-950/35 p-3 shadow-lg shadow-red-950/20">
+            <div className="flex items-center gap-2 text-red-300 font-bold text-xs uppercase tracking-wide">
+              <AlertTriangle className="w-4 h-4" /> Откат — сохранить этот блок
+            </div>
+            <p className="text-[11px] text-red-100/80 mt-1">Если после патча пропал интернет, выросла нагрузка или b4 работает хуже, восстановите резервную копию и перезапустите firewall:</p>
+            <div className="relative mt-2 bg-black/70 rounded border border-red-500/40 p-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="absolute right-1 top-1 h-6 px-2 text-[11px] text-red-300 hover:text-red-200"
+                onClick={() => copy("cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart", "rollback")}
+              >
+                {copiedId === "rollback" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span className="ml-1">Копировать откат</span>
+              </Button>
+              <pre className="text-red-200 text-[11px] leading-5 pr-28 overflow-x-auto">cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart</pre>
+            </div>
           </div>
         </div>
       </div>
