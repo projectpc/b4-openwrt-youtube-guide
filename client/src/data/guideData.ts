@@ -29,7 +29,6 @@ export interface StrategyPreset {
   name: string;
   ispTarget: string;
   description: string;
-  effectiveness: number; // 0-100%
   tcpFrag: string;
   faking: string;
   udpHandling: string;
@@ -41,9 +40,8 @@ export const youtubeStrategies: StrategyPreset[] = [
   {
     id: "combo-pastseq",
     name: "Combo + Pastseq (Дефолт TSPU v1.81)",
-    ispTarget: "Ростелеком, МТС, Мегафон, Дом.ру, Билайн (универсальный)",
+    ispTarget: "Проверять только через Discovery на своей линии",
     description: "Разбиение TLS ClientHello на два сегмента (split + sni) с инъекцией поддельного пакета с отстающим номером sequence (pastseq) и рандомизированной задержкой 20-70 мс.",
-    effectiveness: 94,
     tcpFrag: "combo (split2 / middle SNI + ext/pastseq)",
     faking: "pastseq, offset: 10000, payload: STUN, len: 1",
     udpHandling: "QUIC filter / refuse fallback to TCP",
@@ -57,9 +55,8 @@ export const youtubeStrategies: StrategyPreset[] = [
   {
     id: "md5-combo-pastseq",
     name: "TCP MD5 + Combo + Pastseq",
-    ispTarget: "Региональные ТСПУ с глубоким reassembly TCP-стека",
+    ispTarget: "Резервный вариант после неудачи базового Discovery",
     description: "Добавление опции TCP MD5 Signature (RFC 2385) в фейковые пакеты. ТСПУ признает пакет валидным и сбрасывает проверку, а конечный сервер Google отбрасывает фейк из-за несовпадения ключа.",
-    effectiveness: 91,
     tcpFrag: "combo + md5sig",
     faking: "pastseq + tcp_md5=true",
     udpHandling: "drop QUIC or mute UDP 443",
@@ -73,9 +70,8 @@ export const youtubeStrategies: StrategyPreset[] = [
   {
     id: "postrst-combo",
     name: "Post-ClientHello RST + Combo",
-    ispTarget: "Провайдеры с таймерами десинхронизации сессий",
+    ispTarget: "Только если Discovery подтвердил необходимость",
     description: "Отправка фиктивного TCP RST с заниженным TTL сразу после ClientHello. Промежуточный DPI ТСПУ считает сессию разорванной и перестает парсить поток, в то время как сервер YouTube продолжает отдавать 4K видео.",
-    effectiveness: 89,
     tcpFrag: "combo fragmentation",
     faking: "post_rst count=3, ttl=7",
     udpHandling: "filter QUIC Initial",
@@ -88,9 +84,8 @@ export const youtubeStrategies: StrategyPreset[] = [
   {
     id: "disorder-aggressive",
     name: "Disorder Reverse + ACK Jitter",
-    ispTarget: "Агрессивные DPI с блокировкой первого сегмента",
+    ispTarget: "Экспериментальный вариант после подтверждения Discovery",
     description: "Нарушение порядка следования сегментов: второй сегмент ClientHello отправляется раньше первого. DPI буферизует трафик или падает по таймауту, видеопоток googlevideo.com не замедляется.",
-    effectiveness: 86,
     tcpFrag: "disorder (reverse order)",
     faking: "fake_per_segment count=3",
     udpHandling: "refuse QUIC 443",
@@ -122,7 +117,7 @@ export const troubleshootingList: TroubleshootingItem[] = [
     symptom: "В Chrome/Edge видео бесконечно буферизуются, а в Firefox или при выключенном QUIC всё работает.",
     cause: "DPI блокирует или дропает UDP 443 для googlevideo.com, а браузер зависает в попытке соединения по QUIC.",
     solution: "Включить отсечение QUIC в сете b4 (Set -> UDP -> Reject/Refuse QUIC) или запретить UDP 443 на роутере, принуждая браузер мгновенно откатиться на защищенный TCP.",
-    command: "nft add rule inet fw4 forward ip daddr { 172.217.0.0/16, 142.250.0.0/15 } udp dport 443 reject"
+    command: "# В Web UI b4: Сеты → YouTube → UDP → режим Reject/Refuse для QUIC"
   },
   {
     problem: "IPv6 утекает мимо правил b4",
@@ -163,8 +158,8 @@ export const youtubeDomains = [
 ];
 
 export const benchmarkData = [
-  { resolution: "1080p60", baseline: "Буферизация (144p)", b4Combo: "Мгновенно (60 fps)", speedMbps: 45 },
-  { resolution: "1440p (2K)", baseline: "Ошибка загрузки", b4Combo: "Плавное (без фризов)", speedMbps: 85 },
-  { resolution: "2160p (4K60)", baseline: "Недоступно", b4Combo: "Стабильно (буфер 35 сек)", speedMbps: 140 },
-  { resolution: "Shorts / Live", baseline: "Задержка 15-20 сек", b4Combo: "Мгновенный старт (<1 сек)", speedMbps: 60 }
+  { resolution: "1080p60", baseline: "Сравнить до установки", b4Combo: "Проверить после Discovery", metric: "Фактическая скорость зависит от линии" },
+  { resolution: "1440p (2K)", baseline: "Проверить в DPI Detector", b4Combo: "Проверить через Connections", metric: "Не использовать абсолютные цифры Discovery" },
+  { resolution: "2160p (4K60)", baseline: "Проверить стабильность TCP/QUIC", b4Combo: "Проверить буферизацию", metric: "Оценивать реальным тестом YouTube" },
+  { resolution: "Shorts / Live", baseline: "Проверить задержку", b4Combo: "Проверить после включения Watchdog", metric: "Сравнивать одинаковые условия" }
 ];

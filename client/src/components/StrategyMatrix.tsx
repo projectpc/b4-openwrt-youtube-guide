@@ -2,7 +2,7 @@ import React from "react";
 import { youtubeStrategies } from "../data/guideData";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Zap } from "lucide-react";
+import { SearchCheck } from "lucide-react";
 
 interface Props {
   selectedId: string;
@@ -60,17 +60,9 @@ export function StrategyMatrix({ selectedId, onSelect }: Props) {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-muted-foreground">Эффективность на ТСПУ РФ:</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 bg-muted rounded-full h-1.5 overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-teal-400 to-cyan-400 h-1.5 rounded-full" 
-                        style={{ width: `${s.effectiveness}%` }}
-                      />
-                    </div>
-                    <span className="font-mono font-bold text-cyan-400">{s.effectiveness}%</span>
-                  </div>
+                <div className="flex items-center gap-2 text-xs pt-1 text-cyan-300">
+                  <SearchCheck className="h-4 w-4" />
+                  <span>Статус: требует проверки Discovery на вашей линии</span>
                 </div>
               </CardContent>
             </Card>

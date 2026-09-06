@@ -40,10 +40,10 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-bold text-lg text-white">
-                  b4 Engine <span className="text-cyan-400 font-mono text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">v1.81.0</span>
+                  b4 Engine <span className="text-cyan-400 font-mono text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">main audit</span>
                 </span>
                 <Badge variant="outline" className="border-emerald-500/40 text-emerald-400 bg-emerald-950/30 text-xs">
-                  ● GL-MT6000 Verified
+                  ● Профиль GL-MT6000
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground font-mono">
@@ -188,6 +188,26 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <section className="container pb-8">
+        <Card className="border-cyan-500/20 bg-cyan-950/10">
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center gap-2 text-cyan-300 font-mono text-xs">
+              <FileCode className="w-4 h-4" /> Полный аудит документации b4
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Инструкция сверена с русскоязычными разделами установки, настроек, сетов, TCP/UDP, DNS, Discovery, Watchdog, DPI Detector, Connections, маршрутизации, безопасности и бэкапа. Скорость Discovery и результаты стратегий не являются универсальными измерениями: подтверждайте их на своей линии.
+            </p>
+            <div className="flex flex-wrap gap-2 text-xs font-mono">
+              <a href="https://docs.b4core.app/ru/docs/install/openwrt/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">OpenWrt</a>
+              <a href="https://docs.b4core.app/ru/docs/discovery/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">Discovery</a>
+              <a href="https://docs.b4core.app/ru/docs/detector/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">DPI Detector</a>
+              <a href="https://docs.b4core.app/ru/docs/dns/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">DNS</a>
+              <a href="https://docs.b4core.app/ru/docs/settings/backup/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">Backup</a>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-border/80 py-6 bg-card/40 text-center text-xs text-muted-foreground font-mono">

@@ -13,7 +13,7 @@ export function BenchmarkTab() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-display font-bold text-white flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-cyan-400" />
-            Сравнение воспроизведения видео на GL-MT6000: Baseline vs b4 Combo
+            Матрица проверки YouTube на GL-MT6000: до и после b4
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -24,7 +24,7 @@ export function BenchmarkTab() {
                   <th className="pb-2">Разрешение / Формат</th>
                   <th className="pb-2">Без b4 (Провайдерский ТСПУ)</th>
                   <th className="pb-2">С b4 (Combo + Pastseq)</th>
-                  <th className="pb-2 text-right">Скорость CDN</th>
+                  <th className="pb-2 text-right">Что проверить</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
@@ -36,7 +36,7 @@ export function BenchmarkTab() {
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       {row.b4Combo}
                     </td>
-                    <td className="py-2.5 text-right text-cyan-300 font-bold">{row.speedMbps} Мбит/с</td>
+                    <td className="py-2.5 text-right text-cyan-300 max-w-[260px]">{row.metric}</td>
                   </tr>
                 ))}
               </tbody>
