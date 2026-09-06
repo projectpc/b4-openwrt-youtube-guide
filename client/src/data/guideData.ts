@@ -109,8 +109,8 @@ export const troubleshootingList: TroubleshootingItem[] = [
     problem: "Flow Offloading 'съедает' перехват пакетов b4",
     symptom: "b4 запущен, правила есть, но YouTube продолжает тормозить в 144p или не открывается.",
     cause: "В OpenWrt Firewall4 аппаратный или программный оффлоадинг переводит сессию в fast-path в обход хуков NFQUEUE.",
-    solution: "Задержите оффлоад до 40-го пакета в /usr/share/firewall4/templates/ruleset.uc либо временно отключите Software flow offloading в LuCI -> Network -> Firewall.",
-    command: "sed -i 's/meta l4proto { tcp, udp } flow offload @ft;/meta l4proto { tcp, udp } ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 restart"
+    solution: "Сначала проверьте наличие flowtable через fw4 print. Если offloading активен, включите conntrack accounting, сохраните backup ruleset.uc, замените правило на порог ge 40 и перезапустите firewall. Если flowtable нет, патч не нужен.",
+    command: "sysctl -w net.netfilter.nf_conntrack_acct=1 && cp -a /usr/share/firewall4/templates/ruleset.uc /root/ruleset.uc.before-b4 && sed -i 's/meta l4proto { tcp, udp } flow offload @ft;/meta l4proto { tcp, udp } ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart"
   },
   {
     problem: "Блокировка по протоколу QUIC (HTTP/3 на UDP 443)",

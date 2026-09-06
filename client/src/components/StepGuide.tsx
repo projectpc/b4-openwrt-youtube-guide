@@ -33,7 +33,7 @@ export function StepGuide() {
           </div>
           <p className="text-sm text-muted-foreground mt-1">
             На OpenWrt 25.12 (ядро 6.12) используется пакетный менеджер <code>apk</code> и фаервол <code>nftables</code>. 
-            Для перехвата пакетов в user-space движку b4 требуются модули <code>kmod-nft-queue</code> и <code>kmod-nft-conntrack</code>.
+            Для перехвата пакетов в user-space движку b4 нужен <code>kmod-nft-queue</code>; для conntrack на OpenWrt 25.12 пакет называется <code>kmod-nf-conntrack</code>.
           </p>
         </div>
 
@@ -44,17 +44,17 @@ export function StepGuide() {
               size="sm" 
               variant="ghost" 
               className="h-6 px-2 text-xs text-cyan-400 hover:text-cyan-300"
-              onClick={() => copy("apk update && apk add kmod-nft-queue kmod-nft-nat kmod-nft-compat kmod-nft-conntrack curl ca-certificates jq", "cmd-1")}
+              onClick={() => copy("apk update && apk add kmod-nft-queue kmod-nft-nat kmod-nft-compat kmod-nf-conntrack curl ca-certificates jq", "cmd-1")}
             >
               {copiedId === "cmd-1" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span className="ml-1">Копировать</span>
             </Button>
           </div>
           <pre className="text-emerald-400 overflow-x-auto py-1">
-            apk update && apk add kmod-nft-queue kmod-nft-nat kmod-nft-compat kmod-nft-conntrack curl ca-certificates jq
+            apk update && apk add kmod-nft-queue kmod-nft-nat kmod-nft-compat kmod-nf-conntrack curl ca-certificates jq
           </pre>
           <div className="text-[11px] text-muted-foreground pt-1">
-            * Если на вашем образе используется opkg: <code>opkg update && opkg install kmod-nft-queue kmod-nft-conntrack curl ca-certificates</code>
+            * Для старых образов с <code>opkg</code> установите минимум: <code>opkg update && opkg install curl ca-certificates</code>. Имена kernel-модулей сверяйте с репозиторием конкретной версии.
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function StepGuide() {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            По умолчанию Flow Offload в OpenWrt сбрасывает соединение в fast-path на 1-2 пакете, из-за чего b4 перестает видеть трафик рукопожатия TLS. Необходимо отложить оффлоад до 40-го пакета:
+            Если в активном Firewall4 есть правило <code>flow offload @ft</code>, поток может уйти в fast-path до того, как b4 закончит обработку первых пакетов. Для совместной работы оставьте software offloading включённым, но отложите его до 40-го пакета. Если flowtable не используется, этот патч не нужен.
           </p>
         </div>
 
@@ -126,17 +126,17 @@ export function StepGuide() {
               size="sm" 
               variant="ghost" 
               className="h-6 px-2 text-xs text-cyan-400 hover:text-cyan-300"
-              onClick={() => copy("sed -i 's/meta l4proto { tcp, udp } flow offload @ft;/meta l4proto { tcp, udp } ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 restart", "cmd-3")}
+              onClick={() => copy("sysctl -w net.netfilter.nf_conntrack_acct=1 && cp -a /usr/share/firewall4/templates/ruleset.uc /root/ruleset.uc.before-b4 && sed -i 's/meta l4proto { tcp, udp } flow offload @ft;/meta l4proto { tcp, udp } ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart", "cmd-3")}
             >
               {copiedId === "cmd-3" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               <span className="ml-1">Копировать</span>
             </Button>
           </div>
           <pre className="text-amber-300 overflow-x-auto py-1">
-            sed -i 's/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 restart
+            sysctl -w net.netfilter.nf_conntrack_acct=1 && cp -a /usr/share/firewall4/templates/ruleset.uc /root/ruleset.uc.before-b4 && sed -i 's/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart
           </pre>
           <div className="text-[11px] text-muted-foreground pt-1">
-            Проверка диагностики: запустите <code>/usr/bin/b4 --sysinfo</code> и убедитесь, что порог оффлоада равен 40 пакетов (зеленый статус OK).
+            Перед запуском проверьте <code>fw4 print | grep -E 'flowtable|flow offload|original packets'</code>. Команда включает conntrack accounting, сохраняет резервную копию, проверяет синтаксис и перезапускает firewall. Для отката: <code>cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart</code>. После применения проверьте <code>nft list chain inet fw4 forward | grep -E 'flow offload|original packets'</code>.
           </div>
         </div>
       </div>
