@@ -153,6 +153,30 @@ logread -e b4 | tail -50`}</pre>
         </Card>
       </div>
 
+      <Card className="border-2 border-red-500/70 bg-red-950/25 shadow-lg shadow-red-950/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display text-red-300 flex items-center gap-2 uppercase tracking-wide">
+            <AlertTriangle className="w-4 h-4" /> Полное удаление b4 после установки
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-red-100/85">Команда остановит и отключит службу, сохранит конфигурацию в <code>/root/b4-config-before-remove</code>, удалит службу, бинарники и каталоги конфигурации в обоих возможных местах.</p>
+          <div className="relative bg-black/70 rounded-lg p-3 border border-red-500/40 font-mono text-[11px]">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="absolute right-2 top-2 h-6 px-2 text-xs text-red-300 hover:text-red-200"
+              onClick={() => copy("mkdir -p /root/b4-config-before-remove && cp -a /etc/b4 /root/b4-config-before-remove/etc-b4 2>/dev/null || true; cp -a /opt/etc/b4 /root/b4-config-before-remove/opt-b4 2>/dev/null || true; /etc/init.d/b4 stop 2>/dev/null || true; /etc/init.d/b4 disable 2>/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2>/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check && /etc/init.d/firewall restart", "uninstall")}
+            >
+              {copiedId === "uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span className="ml-1">Копировать удаление</span>
+            </Button>
+            <pre className="text-red-200 leading-5 pr-32 overflow-x-auto">mkdir -p /root/b4-config-before-remove &amp;&amp; cp -a /etc/b4 /root/b4-config-before-remove/etc-b4 2&gt;/dev/null || true; cp -a /opt/etc/b4 /root/b4-config-before-remove/opt-b4 2&gt;/dev/null || true; /etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
+          </div>
+          <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление таблицы <code>b4_mangle</code> безопасно только для таблицы b4; не удаляйте другие nftables-таблицы.</p>
+        </CardContent>
+      </Card>
+
       {/* Шаг 3: Настройка Flow Offload */}
       <div className="relative pl-8 border-l-2 border-cyan-500/40 space-y-3">
         <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-cyan-950 border-2 border-amber-400 flex items-center justify-center font-mono text-xs font-bold text-amber-300">
