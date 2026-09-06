@@ -173,7 +173,24 @@ logread -e b4 | tail -50`}</pre>
             </Button>
             <pre className="text-red-200 leading-5 pr-32 overflow-x-auto">mkdir -p /root/b4-config-before-remove &amp;&amp; cp -a /etc/b4 /root/b4-config-before-remove/etc-b4 2&gt;/dev/null || true; cp -a /opt/etc/b4 /root/b4-config-before-remove/opt-b4 2&gt;/dev/null || true; /etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
           </div>
-          <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление таблицы <code>b4_mangle</code> безопасно только для таблицы b4; не удаляйте другие nftables-таблицы.</p>
+          <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление b4 само по себе не откатывает patch flow offloading, если файла <code>/root/ruleset.uc.before-b4</code> нет.</p>
+
+          <div className="mt-3 rounded-lg border-2 border-amber-500/70 bg-amber-950/30 p-3">
+            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wide">
+              <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
+            </div>
+            <p className="text-[11px] text-amber-100/80 mt-1">Сначала используйте backup, если он существует. Ручной fallback ниже применяйте только если вы точно знаете, что заменяли именно стандартную строку firewall4 и других изменений в шаблоне нет.</p>
+            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
+              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
+              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
+            </div>
+          </div>
+
+          <div className="mt-3 rounded-lg border border-slate-500/60 bg-slate-950/40 p-3">
+            <div className="text-slate-200 font-bold text-xs uppercase tracking-wide">Очистка только таблицы b4</div>
+            <p className="text-[11px] text-slate-300/80 mt-1">Удаляйте только таблицу <code>inet b4_mangle</code>, если она осталась после остановки b4. Не используйте wildcard и не удаляйте другие таблицы nftables.</p>
+            <code className="block mt-2 text-[11px] text-slate-200 font-mono">nft delete table inet b4_mangle 2&gt;/dev/null || true</code>
+          </div>
         </CardContent>
       </Card>
 
