@@ -94,3 +94,10 @@
 - [x] Добавить скриншот в репозиторий
 - [x] Заменить внешний Manus URL на локальный путь GitHub Pages
 - [x] Проверить сборку и доступность изображения после deployment
+
+## Аналитика посещений GitHub Pages
+
+- [x] Выбрать Cloudflare Web Analytics для подсчёта посещений GitHub Pages
+- [x] Подключить предоставленный Cloudflare JS snippet перед `</body>`
+- [x] Проверить TypeScript, Vitest, production build и наличие snippet в итоговом HTML
+- [ ] Проверить появление первых pageviews в панели Cloudflare после deployment
