@@ -248,7 +248,6 @@ logread -e b4 | tail -50`}</pre>
                 <li>Перейдите в <strong>Settings → База данных GeoIP</strong>.</li>
                 <li>Выберите источник <strong>b4geoip</strong>.</li>
                 <li>Нажмите <strong>«Скачать»</strong>.</li>
-                <li>чччччччччччч</strong>.</li>
               </ol>
             </div>
 
