@@ -194,7 +194,7 @@ export default function Home() {
     <img
       src={`${import.meta.env.BASE_URL}assets/b4-discovery-screenshots.jpg`}
       alt="Скриншоты интерфейса b4: сеты, фильтрация доменов, категории GeoSite и GeoIP"
-      className="block w-full max-w-5xl h-auto object-contain rounded-lg border border-border/70"
+      className="block w-full max-w-[1200px] h-auto object-contain rounded-lg border border-border/70"
     />
   </div>
 
@@ -202,7 +202,7 @@ export default function Home() {
     <img
       src={`${import.meta.env.BASE_URL}assets/FakePacketCount8.jpg`}
       alt="Дополнительный скриншот настройки b4"
-      className="block w-full max-w-5xl h-auto object-contain rounded-lg border border-border/70"
+      className="block w-full max-w-[1200px] h-auto object-contain rounded-lg border border-border/70"
     />
   </div>
 </CardContent>
