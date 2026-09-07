@@ -17,6 +17,11 @@ export function Troubleshooting() {
 
   return (
     <div className="space-y-4">
+      <Card className="border-amber-500/30 bg-amber-950/15">
+        <CardContent className="py-3 text-xs text-muted-foreground">
+          <strong className="text-amber-300">Справочный чек-лист:</strong> этот раздел не получает состояние роутера автоматически. Сначала сопоставьте симптом с логами b4/OpenWrt и только затем применяйте подходящую рекомендацию.
+        </CardContent>
+      </Card>
       {troubleshootingList.map((item, idx) => (
         <Card key={idx} className="border-border/80 bg-card/70">
           <CardHeader className="pb-2">

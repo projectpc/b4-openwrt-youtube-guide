@@ -279,9 +279,13 @@ logread -e b4 | tail -50`}</pre>
               <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
             </div>
             <p className="text-[11px] text-amber-100/80 mt-1"><strong>Важно:</strong> Если ранее использовался патч из пункта 3 «Адаптация Flow Offloading в Firewall4», перед удалением b4 необходимо сначала выполнить откат изменений Flow Offloading.</p>
-            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
-              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
-              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
+            <div className="mt-2 flex justify-end">
+              <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] text-amber-300 hover:text-amber-200" onClick={() => copy('if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart; else echo "ОШИБКА: backup /root/ruleset.uc.before-b4 не найден. Откат Flow Offloading не выполнен."; fi', "rollback-uninstall")}>
+                {copiedId === "rollback-uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать откат</span>
+              </Button>
+            </div>
+            <div className="mt-1 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
+              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc &amp;&amp; fw4 check &amp;&amp; /etc/init.d/firewall restart; else echo &quot;ОШИБКА: backup /root/ruleset.uc.before-b4 не найден. Откат Flow Offloading не выполнен.&quot;; fi</div>
             </div>
           </div>
 

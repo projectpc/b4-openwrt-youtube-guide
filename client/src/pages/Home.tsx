@@ -150,6 +150,11 @@ export default function Home() {
           </TabsContent>
 
           <TabsContent value="strategies">
+            <Card className="mb-4 border-cyan-500/30 bg-cyan-950/15">
+              <CardContent className="py-3 text-xs text-muted-foreground">
+                <strong className="text-cyan-300">Справочная вкладка:</strong> Discovery сам перебирает встроенные пресеты, проверяет их и создаёт сет. Не вставляйте эти JSON-фрагменты в конфигурацию вслепую; используйте их только для понимания результата Discovery или ручной настройки после проверки.
+              </CardContent>
+            </Card>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-8">
                 <StrategyMatrix selectedId={selectedStrategy} onSelect={setSelectedStrategy} />
