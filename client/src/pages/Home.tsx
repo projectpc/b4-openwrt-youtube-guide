@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { targetRouter, youtubeStrategies, youtubeDomains } from "../data/guideData";
+import React from "react";
+import { targetRouter } from "../data/guideData";
 import { 
-  Cpu, Terminal, Shield, Play, Sliders, Share2, Image as ImageIcon,
-  AlertTriangle, ExternalLink, Copy, Check
+  Cpu, Terminal, Shield, Sliders, Share2, Image as ImageIcon,
+  AlertTriangle, ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -11,22 +11,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 import { StepGuide } from "../components/StepGuide";
-import { StrategyMatrix } from "../components/StrategyMatrix";
 import { Troubleshooting } from "../components/Troubleshooting";
 
 export default function Home() {
-  const [selectedStrategy, setSelectedStrategy] = useState(youtubeStrategies[0].id);
-  const [copiedSnippet, setCopiedSnippet] = useState(false);
-
-  const currentStrategyObj = youtubeStrategies.find(s => s.id === selectedStrategy) || youtubeStrategies[0];
-
-  const copySnippet = () => {
-    navigator.clipboard.writeText(currentStrategyObj.configSnippet);
-    setCopiedSnippet(true);
-    toast.success("JSON конфигурации скопирован");
-    setTimeout(() => setCopiedSnippet(false), 2000);
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-cyan-500/30">
       {/* Header */}
@@ -34,7 +21,10 @@ export default function Home() {
         <div className="container py-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-cyan-950/80 border border-cyan-500/40 p-1 flex items-center justify-center">
-              <img src="/manus-storage/b4_logo_icon_6cf9a0fc.png" alt="b4 logo" className="w-full h-full object-contain" />
+              <div className="w-full h-full rounded-md bg-gradient-to-br from-cyan-400/20 via-cyan-950 to-slate-950 border border-cyan-400/50 flex items-center justify-center shadow-inner" aria-label="b4 logo">
+                <Cpu className="w-6 h-6 text-cyan-300" strokeWidth={1.5} />
+                <span className="sr-only">b4 logo</span>
+              </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -130,8 +120,8 @@ export default function Home() {
             <TabsTrigger value="install" className="text-xs font-mono">
               <Terminal className="w-3.5 h-3.5 mr-1.5" /> Установка
             </TabsTrigger>
-            <TabsTrigger value="strategies" className="text-xs font-mono">
-              <Sliders className="w-3.5 h-3.5 mr-1.5" /> Стратегии
+            <TabsTrigger value="telegram" className="text-xs font-mono">
+              <Sliders className="w-3.5 h-3.5 mr-1.5" /> Telegram
             </TabsTrigger>
             <TabsTrigger value="screenshots" className="text-xs font-mono">
               <ImageIcon className="w-3.5 h-3.5 mr-1.5" /> Скриншоты
@@ -149,39 +139,44 @@ export default function Home() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="strategies">
-            <Card className="mb-4 border-cyan-500/30 bg-cyan-950/15">
-              <CardContent className="py-3 text-xs text-muted-foreground">
-                <strong className="text-cyan-300">Справочная вкладка:</strong> Discovery сам перебирает встроенные пресеты, проверяет их и создаёт сет. Не вставляйте эти JSON-фрагменты в конфигурацию вслепую; используйте их только для понимания результата Discovery или ручной настройки после проверки.
+          <TabsContent value="telegram">
+            <Card className="border-cyan-500/30 bg-card/70">
+              <CardHeader className="border-b border-border/60">
+                <CardTitle className="text-base font-display text-cyan-300">ИНСТРУКЦИЯ: Telegram через встроенный WebSocket-мост в b4</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Настройка сета Telegram и встроенной маршрутизации через WebSocket.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 text-sm text-muted-foreground">
+                <section>
+                  <h3 className="text-sm font-bold text-white">1. СОЗДАНИЕ СЕТА</h3>
+                  <div className="mt-2 rounded-lg border border-border/70 bg-black/30 p-3 space-y-1 font-mono text-xs">
+                    <p><strong className="text-cyan-300">1.1.</strong> Зайти в веб-интерфейс b4 (<code>http://&lt;IP-роутера&gt;:7000</code>) → раздел «Сети».</p>
+                    <p><strong className="text-cyan-300">1.2.</strong> Нажать «Новый сет», назвать, например: <code>Telegram</code>.</p>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-sm font-bold text-white">2. ВКЛАДКА «ЦЕЛИ»</h3>
+                  <div className="mt-2 rounded-lg border border-border/70 bg-black/30 p-3 space-y-2 font-mono text-xs">
+                    <p><strong className="text-cyan-300">2.1.</strong> Открыть подвкладку «Домены обхода». В блоке «Категории GeoSite обхода» добавить категорию: <code>telegram</code>.</p>
+                    <p><strong className="text-cyan-300">2.2.</strong> Открыть подвкладку «IP обхода». В блоке «Категории GeoIP обхода» добавить категорию: <code>telegram</code>.</p>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-sm font-bold text-white">3. ВКЛАДКА «DNS &amp; МАРШРУТИЗАЦИЯ» → МАРШРУТИЗАЦИЯ ТРАФИКА</h3>
+                  <div className="mt-2 rounded-lg border border-emerald-500/30 bg-emerald-950/15 p-3 space-y-2 font-mono text-xs">
+                    <p><strong className="text-emerald-300">3.1.</strong> Переключиться на подвкладку «Маршрутизация трафика» (<strong>НЕ</strong> «Перенаправление DNS» — это другое, для подмены DNS-резолвера).</p>
+                    <p><strong className="text-emerald-300">3.2.</strong> Включить тумблер «Включить маршрутизацию».</p>
+                    <p><strong className="text-emerald-300">3.3.</strong> В поле «Режим маршрутизации» выбрать: <strong>Telegram через WebSocket (встроенный)</strong>.</p>
+                    <div className="rounded border border-emerald-500/30 bg-black/30 p-2 text-emerald-200">Схема пути: Любое устройство → B4 → WS-узел Telegram → Интернет<br />Резервный путь через Cloudflare встроен автоматически, отдельно настраивать не нужно.</div>
+                    <p><strong className="text-emerald-300">3.4.</strong> В блоке «Исходные интерфейсы» выбрать интерфейсы: <code>br-lan</code> (плюс <code>eth0</code> / <code>eth1</code>, если это отдельные физические порты, не входящие в мост <code>br-lan</code>).</p>
+                    <p><strong className="text-emerald-300">3.5.</strong> «TTL разрешённых IP» — оставить по умолчанию: <code>3600</code> (трогать не нужно).</p>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="text-sm font-bold text-white">4. СОХРАНЕНИЕ</h3>
+                  <div className="mt-2 rounded-lg border border-amber-500/30 bg-amber-950/15 p-3 font-mono text-xs"><strong className="text-amber-300">4.1.</strong> Нажать «Сохранить», «Создать сет» (для нового сета — до этого момента сет неактивен).</div>
+                </section>
               </CardContent>
             </Card>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-8">
-                <StrategyMatrix selectedId={selectedStrategy} onSelect={setSelectedStrategy} />
-              </div>
-              <div className="lg:col-span-4">
-                <Card className="border-border/80 bg-card/80 sticky top-20">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xs font-mono text-cyan-300">
-                        {currentStrategyObj.name}
-                      </CardTitle>
-                      <Button size="sm" variant="ghost" onClick={copySnippet} className="h-6 text-xs text-cyan-400">
-                        {copiedSnippet ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />} Копия
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3 font-mono text-xs">
-                    <pre className="bg-black/70 p-3 rounded text-[11px] text-cyan-300 overflow-x-auto">
-                      {currentStrategyObj.configSnippet}
-                    </pre>
-                    <div className="text-[11px] text-muted-foreground">
-                      Целевые домены: <code>{youtubeDomains.slice(0, 5).join(", ")}</code> + GeoSite <code>youtube</code>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
           </TabsContent>
 
           <TabsContent value="screenshots">
