@@ -272,7 +272,7 @@ logread -e b4 | tail -50`}</pre>
         Как изменить: <strong>TCP → Faking → Fake → Packet Count = 8</strong>.
       </span>
       <br />
-      Там же установите <strong>Fake Payload Type = Preset: STUN</strong>.
+      Там же установите <strong>Fake Payload Type = Preset: STUN</strong>. 
     </li>
     <li>Сохраните изменения.</li>
     <li>
