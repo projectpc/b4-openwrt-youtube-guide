@@ -285,6 +285,9 @@ logread -e b4 | tail -50`}</pre>
     Пока всё работает.
   </p>
 </div>
+                      </CardContent>
+        </Card>
+      </div>
 
       <Card className="border-2 border-red-500/70 bg-red-950/25 shadow-lg shadow-red-950/20">
         <CardHeader className="pb-2">
