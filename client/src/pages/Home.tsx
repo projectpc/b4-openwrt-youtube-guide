@@ -191,7 +191,7 @@ export default function Home() {
               </CardHeader>
               <CardContent className="pt-0">
                 <img
-                  src="https://b4ytguide-abdxntke.manus.space/manus-storage/b4-discovery-screenshots_c352a515.jpg"
+                  src={`${import.meta.env.BASE_URL}assets/b4-discovery-screenshots.jpg`}
                   alt="Скриншоты интерфейса b4: сеты, фильтрация доменов, категории GeoSite и GeoIP"
                   className="block w-full h-auto rounded-lg border border-border/70"
                 />
