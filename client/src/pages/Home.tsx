@@ -190,10 +190,15 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-0">
-                <img
+                  <img
                   src={`${import.meta.env.BASE_URL}assets/b4-discovery-screenshots.jpg`}
                   alt="Скриншоты интерфейса b4: сеты, фильтрация доменов, категории GeoSite и GeoIP"
                   className="block w-full h-auto rounded-lg border border-border/70"
+                />
+                <img
+                  src={`${import.meta.env.BASE_URL}assets/FakePacketCount8.jpg`}
+                  alt="Дополнительный скриншот настройки b4"
+                  className="mt-4 block w-full h-auto rounded-lg border border-border/70"
                 />
               </CardContent>
             </Card>
