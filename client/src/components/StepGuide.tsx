@@ -251,22 +251,40 @@ logread -e b4 | tail -50`}</pre>
               </ol>
             </div>
 
-            <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
-              <h4 className="font-bold text-emerald-300 mb-2">Discovery и сет YouTube</h4>
-              <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
-                <li>Перейдите во вкладку <strong>Discovery</strong>.</li>
-                <li>В поле Discovery введите: <code>googlevideo.com</code>.</li>
-                <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery.</li>
-                <li>После завершения нажмите <strong>Apply as a set</strong>.</li>
-                <li>В левом меню перейдите в раздел <strong>«Сеты»</strong> и откройте созданный сет для редактирования.</li>
-                <li>Во вкладке <strong>«Цели»</strong>, в разделе <strong>«Категории GeoSite обхода»</strong>, выберите категорию <code>youtube</code>.</li>
-                <li>Сохраните изменения.</li>
-                <li>Сохранитеввввввв изменения.</li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+<div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
+  <h4 className="font-bold text-emerald-300 mb-2">Discovery и сет YouTube</h4>
+  <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
+    <li>Перейдите во вкладку <strong>Discovery</strong>.</li>
+    <li>В поле Discovery введите: <code>googlevideo.com</code>.</li>
+    <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery.</li>
+    <li>После завершения нажмите <strong>Apply as a set</strong>.</li>
+    <li>В левом меню перейдите в раздел <strong>«Сеты»</strong> и откройте созданный сет для редактирования.</li>
+    <li>
+      Во вкладке <strong>«Цели»</strong>, в разделе <strong>«Категории GeoSite обхода»</strong>,
+      выберите категорию <code>youtube</code>.
+    </li>
+    <li>
+      При значении <strong>Fake Packet Count = 1</strong> клиенты YouTube на телефоне и телевизоре
+      запускали видео очень долго (на ПК и в браузерах запуск был нормальным).
+      После увеличения значения до <strong>8</strong> запуск видео стал нормальным.
+      <br />
+      <span className="text-emerald-300">
+        Как изменить: <strong>TCP → Faking → Fake → Packet Count = 8</strong>.
+      </span>
+      <br />
+      Там же установите <strong>Fake Payload Type = Preset: STUN</strong>.
+    </li>
+    <li>Сохраните изменения.</li>
+    <li>
+      В сет YouTube дополнительно добавлены категории <code>WhatsApp</code>, <code>Instagram</code>,
+      <code>meta</code> и <code>Facebook</code>, чтобы тот же набор B4 применялся также к этим сервисам.
+    </li>
+  </ol>
+
+  <p className="mt-3 text-emerald-300 font-semibold">
+    Пока всё работает.
+  </p>
+</div>
 
       <Card className="border-2 border-red-500/70 bg-red-950/25 shadow-lg shadow-red-950/20">
         <CardHeader className="pb-2">
