@@ -166,6 +166,9 @@ logread -e b4 | tail -50`}</pre>
           <p className="text-sm text-muted-foreground mt-1">
             Если в активном Firewall4 есть правило <code>flow offload @ft</code>, поток может уйти в fast-path до того, как b4 закончит обработку первых пакетов. Для совместной работы оставьте software offloading включённым, но отложите его до 40-го пакета. Если flowtable не используется, этот патч не нужен.
           </p>
+          <div className="mt-3 rounded-lg border-2 border-red-500 bg-red-950/60 px-4 py-3 text-center shadow-lg shadow-red-950/30">
+            <strong className="text-red-200 text-sm uppercase tracking-wide">Важно: БЕЗ ЭТОГО ПАТЧА У МЕНЯ ОБХОД НЕ РАБОТАЛ!</strong>
+          </div>
         </div>
 
         <div className="bg-black/60 rounded-lg p-3 border border-border/80 font-mono text-xs space-y-2">
@@ -238,7 +241,7 @@ logread -e b4 | tail -50`}</pre>
               <h4 className="font-bold text-cyan-300">База данных Geosite и GeoIP</h4>
               <p className="text-muted-foreground">Если при установке выбрать все рекомендуемые компоненты, RUNET Freedom и b4geoip будут скачаны автоматически.</p>
               <p className="text-muted-foreground">Если базы не были скачаны во время установки:</p>
-              <ol start={3} className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
                 <li>Перейдите в <strong>Settings → База данных Geosite</strong>.</li>
                 <li>Выберите источник <strong>RUNET Freedom</strong>.</li>
                 <li>Нажмите <strong>«Скачать»</strong>.</li>
@@ -250,7 +253,7 @@ logread -e b4 | tail -50`}</pre>
 
             <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
               <h4 className="font-bold text-emerald-300 mb-2">Discovery и сет YouTube</h4>
-              <ol start={9} className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
                 <li>Перейдите во вкладку <strong>Discovery</strong>.</li>
                 <li>В поле Discovery введите: <code>googlevideo.com</code>.</li>
                 <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery.</li>
@@ -271,6 +274,17 @@ logread -e b4 | tail -50`}</pre>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="mt-3 rounded-lg border-2 border-amber-500/70 bg-amber-950/30 p-3">
+            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wide">
+              <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
+            </div>
+            <p className="text-[11px] text-amber-100/80 mt-1"><strong>Важно:</strong> Если ранее использовался патч из пункта 3 «Адаптация Flow Offloading в Firewall4», перед удалением b4 необходимо сначала выполнить откат изменений Flow Offloading.</p>
+            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
+              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
+              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
+            </div>
+          </div>
+
           <p className="text-xs text-red-100/85">Полное удаление останавливает и отключает службу, удаляет бинарники, конфигурацию и geodata. Перед выполнением убедитесь, что b4 больше не нужен.</p>
           <div className="rounded-lg border border-red-500/40 bg-black/40 p-3">
             <div className="flex items-center justify-between gap-3 text-red-200 font-bold text-xs">
@@ -292,17 +306,6 @@ logread -e b4 | tail -50`}</pre>
             <pre className="text-red-200 leading-5 overflow-x-auto">/etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
           </div>
           <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление b4 само по себе не откатывает patch flow offloading, если файла <code>/root/ruleset.uc.before-b4</code> нет.</p>
-
-          <div className="mt-3 rounded-lg border-2 border-amber-500/70 bg-amber-950/30 p-3">
-            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wide">
-              <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
-            </div>
-            <p className="text-[11px] text-amber-100/80 mt-1">Сначала используйте backup, если он существует. Ручной fallback ниже применяйте только если вы точно знаете, что заменяли именно стандартную строку firewall4 и других изменений в шаблоне нет.</p>
-            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
-              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
-              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
-            </div>
-          </div>
 
           <div className="mt-3 rounded-lg border border-slate-500/60 bg-slate-950/40 p-3">
             <div className="text-slate-200 font-bold text-xs uppercase tracking-wide">Очистка только таблицы b4</div>
