@@ -103,7 +103,7 @@ export default function Home() {
                   </div>
                   <div className="flex justify-between pb-1">
                     <span className="text-muted-foreground">Веб-интерфейс b4:</span>
-                    <span className="text-cyan-400 font-bold">http://192.168.8.1:7000</span>
+                    <span className="text-cyan-400 font-bold">http://192.168.1.1:7000</span>
                   </div>
                 </CardContent>
               </Card>
