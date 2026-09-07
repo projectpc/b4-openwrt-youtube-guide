@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Terminal, Copy, Check, CheckCircle2, AlertTriangle, Shield, Play } from "lucide-react";
+import { Terminal, Copy, Check, CheckCircle2, AlertTriangle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -149,54 +149,6 @@ logread -e b4 | tail -50`}</pre>
         </Card>
       </div>
 
-      <Card className="border-2 border-red-500/70 bg-red-950/25 shadow-lg shadow-red-950/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-display text-red-300 flex items-center gap-2 uppercase tracking-wide">
-            <AlertTriangle className="w-4 h-4" /> Полное удаление b4 после установки
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-red-100/85">Полное удаление останавливает и отключает службу, удаляет бинарники, конфигурацию и geodata. Перед выполнением убедитесь, что b4 больше не нужен.</p>
-          <div className="rounded-lg border border-red-500/40 bg-black/40 p-3">
-            <div className="flex items-center justify-between gap-3 text-red-200 font-bold text-xs">
-              <span>Способ 1 — официальный установщик</span>
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("./install.sh --remove --quiet", "remove-script")}>
-                {copiedId === "remove-script" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать</span>
-              </Button>
-            </div>
-            <p className="text-[11px] text-red-100/75 mt-1">Запустите из каталога, где находится <code>install.sh</code>. Ключи <code>--remove --quiet</code> удаляют каталог конфигурации и geodata без дополнительных вопросов.</p>
-            <pre className="text-red-200 text-[11px] leading-5 mt-2 overflow-x-auto">./install.sh --remove --quiet</pre>
-          </div>
-          <div className="mt-3 text-xs text-red-200 font-bold">Способ 2 — ручное удаление</div>
-          <div className="flex justify-end mt-2">
-            <Button size="sm" variant="ghost" className="h-7 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("/etc/init.d/b4 stop 2>/dev/null || true; /etc/init.d/b4 disable 2>/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2>/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check && /etc/init.d/firewall restart", "uninstall")}>
-              {copiedId === "uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать ручное удаление</span>
-            </Button>
-          </div>
-          <div className="bg-black/70 rounded-lg p-3 border border-red-500/40 font-mono text-[11px]">
-            <pre className="text-red-200 leading-5 overflow-x-auto">/etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
-          </div>
-          <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление b4 само по себе не откатывает patch flow offloading, если файла <code>/root/ruleset.uc.before-b4</code> нет.</p>
-
-          <div className="mt-3 rounded-lg border-2 border-amber-500/70 bg-amber-950/30 p-3">
-            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wide">
-              <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
-            </div>
-            <p className="text-[11px] text-amber-100/80 mt-1">Сначала используйте backup, если он существует. Ручной fallback ниже применяйте только если вы точно знаете, что заменяли именно стандартную строку firewall4 и других изменений в шаблоне нет.</p>
-            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
-              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
-              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
-            </div>
-          </div>
-
-          <div className="mt-3 rounded-lg border border-slate-500/60 bg-slate-950/40 p-3">
-            <div className="text-slate-200 font-bold text-xs uppercase tracking-wide">Очистка только таблицы b4</div>
-            <p className="text-[11px] text-slate-300/80 mt-1">Удаляйте только таблицу <code>inet b4_mangle</code>, если она осталась после остановки b4. Не используйте wildcard и не удаляйте другие таблицы nftables.</p>
-            <code className="block mt-2 text-[11px] text-slate-200 font-mono">nft delete table inet b4_mangle 2&gt;/dev/null || true</code>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Шаг 3: Настройка Flow Offload */}
       <div className="relative pl-8 border-l-2 border-cyan-500/40 space-y-3">
         <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-cyan-950 border-2 border-amber-400 flex items-center justify-center font-mono text-xs font-bold text-amber-300">
@@ -267,41 +219,98 @@ logread -e b4 | tail -50`}</pre>
               YouTube & Googlevideo
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Откройте браузер по адресу <code>http://&lt;IP-роутера&gt;:7000</code> (обычно <code>http://192.168.8.1:7000</code> для GL.iNet или <code>http://192.168.1.1:7000</code>).
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <Card className="bg-card/70 border-border/70 p-3 space-y-2">
-            <div className="font-mono text-cyan-400 font-bold flex items-center gap-1.5">
-              <Play className="w-3.5 h-3.5 text-red-400" /> Способ А: Discovery (Автоподбор)
+        <Card className="bg-card/70 border-border/70">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-display text-cyan-300">YouTube</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-xs">
+            <div>
+              <p className="font-bold text-cyan-300 mb-2">Откройте браузер по адресу:</p>
+              <p className="font-mono text-muted-foreground">http://&lt;IP-роутера&gt;:7000</p>
+              <p className="text-muted-foreground mt-1">Обычно:</p>
+              <p className="font-mono text-muted-foreground">http://192.168.8.1:7000 — для GL.iNet</p>
+              <p className="font-mono text-muted-foreground">или http://192.168.1.1:7000</p>
             </div>
-            <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
-              <li>Перейдите во вкладку <strong>Discovery</strong></li>
-              <li>В поле введите: <code>googlevideo.com</code></li>
-              <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery</li>
-              <li>После подтверждения нажмите <strong>Apply as a set</strong></li>
-              <li>Откройте созданный сет для редактирования</li>
-              <li>Во вкладке <strong>Targets</strong> выберите категорию GeoSite <code>youtube</code></li>
-              <li>Сет автоматически активируется на первом месте и охватит CDN видео и обложек</li>
-            </ol>
-          </Card>
 
-          <Card className="bg-card/70 border-border/70 p-3 space-y-2">
-            <div className="font-mono text-cyan-400 font-bold flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-emerald-400" /> Способ Б: GeoSite База категорий
+            <div className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3 space-y-3">
+              <h4 className="font-bold text-cyan-300">База данных Geosite и GeoIP</h4>
+              <p className="text-muted-foreground">Если при установке выбрать все рекомендуемые компоненты, RUNET Freedom и b4geoip будут скачаны автоматически.</p>
+              <p className="text-muted-foreground">Если базы не были скачаны во время установки:</p>
+              <ol start={3} className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
+                <li>Перейдите в <strong>Settings → База данных Geosite</strong>.</li>
+                <li>Выберите источник <strong>RUNET Freedom</strong>.</li>
+                <li>Нажмите <strong>«Скачать»</strong>.</li>
+                <li>Перейдите в <strong>Settings → База данных GeoIP</strong>.</li>
+                <li>Выберите источник <strong>b4geoip</strong>.</li>
+                <li>Нажмите <strong>«Скачать»</strong>.</li>
+              </ol>
             </div>
-            <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
-              <li>Перейдите в <strong>Settings → Geodat</strong></li>
-              <li>Выберите источник <strong>RUNET Freedom</strong> и нажмите <strong>Download</strong></li>
-              <li>Используйте этот вариант, если Discovery недоступен или нужен готовый набор GeoSite</li>
-              <li>В созданном сете во вкладке <strong>Targets</strong> выберите категорию GeoSite <code>youtube</code></li>
-              <li>Проверьте список целей и сохраните сет</li>
-            </ol>
-          </Card>
-        </div>
+
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
+              <h4 className="font-bold text-emerald-300 mb-2">Discovery и сет YouTube</h4>
+              <ol start={9} className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
+                <li>Перейдите во вкладку <strong>Discovery</strong>.</li>
+                <li>В поле Discovery введите: <code>googlevideo.com</code>.</li>
+                <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery.</li>
+                <li>После завершения нажмите <strong>Apply as a set</strong>.</li>
+                <li>В левом меню перейдите в раздел <strong>«Сеты»</strong> и откройте созданный сет для редактирования.</li>
+                <li>Во вкладке <strong>«Цели»</strong>, в разделе <strong>«Категории GeoSite обхода»</strong>, выберите категорию <code>youtube</code>.</li>
+                <li>Сохраните изменения.</li>
+              </ol>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <Card className="border-2 border-red-500/70 bg-red-950/25 shadow-lg shadow-red-950/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display text-red-300 flex items-center gap-2 uppercase tracking-wide">
+            <AlertTriangle className="w-4 h-4" /> Полное удаление b4 после установки
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-red-100/85">Полное удаление останавливает и отключает службу, удаляет бинарники, конфигурацию и geodata. Перед выполнением убедитесь, что b4 больше не нужен.</p>
+          <div className="rounded-lg border border-red-500/40 bg-black/40 p-3">
+            <div className="flex items-center justify-between gap-3 text-red-200 font-bold text-xs">
+              <span>Способ 1 — официальный установщик</span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("./install.sh --remove --quiet", "remove-script")}>
+                {copiedId === "remove-script" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать</span>
+              </Button>
+            </div>
+            <p className="text-[11px] text-red-100/75 mt-1">Запустите из каталога, где находится <code>install.sh</code>. Ключи <code>--remove --quiet</code> удаляют каталог конфигурации и geodata без дополнительных вопросов.</p>
+            <pre className="text-red-200 text-[11px] leading-5 mt-2 overflow-x-auto">./install.sh --remove --quiet</pre>
+          </div>
+          <div className="mt-3 text-xs text-red-200 font-bold">Способ 2 — ручное удаление</div>
+          <div className="flex justify-end mt-2">
+            <Button size="sm" variant="ghost" className="h-7 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("/etc/init.d/b4 stop 2>/dev/null || true; /etc/init.d/b4 disable 2>/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2>/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check && /etc/init.d/firewall restart", "uninstall")}>
+              {copiedId === "uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать ручное удаление</span>
+            </Button>
+          </div>
+          <div className="bg-black/70 rounded-lg p-3 border border-red-500/40 font-mono text-[11px]">
+            <pre className="text-red-200 leading-5 overflow-x-auto">/etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
+          </div>
+          <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление b4 само по себе не откатывает patch flow offloading, если файла <code>/root/ruleset.uc.before-b4</code> нет.</p>
+
+          <div className="mt-3 rounded-lg border-2 border-amber-500/70 bg-amber-950/30 p-3">
+            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wide">
+              <AlertTriangle className="w-4 h-4" /> Отдельный откат flow offloading
+            </div>
+            <p className="text-[11px] text-amber-100/80 mt-1">Сначала используйте backup, если он существует. Ручной fallback ниже применяйте только если вы точно знаете, что заменяли именно стандартную строку firewall4 и других изменений в шаблоне нет.</p>
+            <div className="mt-2 bg-black/70 rounded border border-amber-500/40 p-2 font-mono text-[11px] text-amber-200 overflow-x-auto">
+              <div>if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; else sed -i 's/meta l4proto &#123; tcp, udp &#125; ct original packets ge 40 flow offload @ft;/meta l4proto &#123; tcp, udp &#125; flow offload @ft;/g' /usr/share/firewall4/templates/ruleset.uc; fi</div>
+              <div className="mt-1">fw4 check &amp;&amp; /etc/init.d/firewall restart</div>
+            </div>
+          </div>
+
+          <div className="mt-3 rounded-lg border border-slate-500/60 bg-slate-950/40 p-3">
+            <div className="text-slate-200 font-bold text-xs uppercase tracking-wide">Очистка только таблицы b4</div>
+            <p className="text-[11px] text-slate-300/80 mt-1">Удаляйте только таблицу <code>inet b4_mangle</code>, если она осталась после остановки b4. Не используйте wildcard и не удаляйте другие таблицы nftables.</p>
+            <code className="block mt-2 text-[11px] text-slate-200 font-mono">nft delete table inet b4_mangle 2&gt;/dev/null || true</code>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

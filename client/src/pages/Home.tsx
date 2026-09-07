@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { targetRouter, youtubeStrategies, youtubeDomains } from "../data/guideData";
 import { 
-  Cpu, Terminal, Shield, Play, Sliders, Share2, Activity, 
-  AlertTriangle, ExternalLink, Copy, Check, FileCode
+  Cpu, Terminal, Shield, Play, Sliders, Share2, Image as ImageIcon,
+  AlertTriangle, ExternalLink, Copy, Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { StepGuide } from "../components/StepGuide";
 import { StrategyMatrix } from "../components/StrategyMatrix";
 import { Troubleshooting } from "../components/Troubleshooting";
-import { BenchmarkTab } from "../components/BenchmarkTab";
 
 export default function Home() {
   const [selectedStrategy, setSelectedStrategy] = useState(youtubeStrategies[0].id);
@@ -40,7 +39,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-display font-bold text-lg text-white">
-                  b4 Engine <span className="text-cyan-400 font-mono text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">main audit</span>
+                  b4 Engine <span className="text-cyan-400 font-mono text-xs px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800">openwrt guide</span>
                 </span>
                 <Badge variant="outline" className="border-emerald-500/40 text-emerald-400 bg-emerald-950/30 text-xs">
                   ● Профиль GL-MT6000
@@ -126,15 +125,16 @@ export default function Home() {
       {/* Main content */}
       <main className="container py-8 flex-1 space-y-6">
         <Tabs defaultValue="install" className="space-y-6">
-          <TabsList className="bg-card border border-border p-1 rounded-lg grid grid-cols-2 sm:grid-cols-4 gap-1 max-w-2xl">
+                      <TabsList className="bg-card border border-border p-1 rounded-lg grid grid-cols-2 sm:grid-cols-4 gap-1 max-w-3xl">
+
             <TabsTrigger value="install" className="text-xs font-mono">
               <Terminal className="w-3.5 h-3.5 mr-1.5" /> Установка
             </TabsTrigger>
             <TabsTrigger value="strategies" className="text-xs font-mono">
               <Sliders className="w-3.5 h-3.5 mr-1.5" /> Стратегии
             </TabsTrigger>
-            <TabsTrigger value="benchmark" className="text-xs font-mono">
-              <Activity className="w-3.5 h-3.5 mr-1.5" /> Симулятор & Тесты
+            <TabsTrigger value="screenshots" className="text-xs font-mono">
+              <ImageIcon className="w-3.5 h-3.5 mr-1.5" /> Скриншоты
             </TabsTrigger>
             <TabsTrigger value="troubleshoot" className="text-xs font-mono">
               <AlertTriangle className="w-3.5 h-3.5 mr-1.5" /> Траблшутинг
@@ -179,8 +179,24 @@ export default function Home() {
             </div>
           </TabsContent>
 
-          <TabsContent value="benchmark">
-            <BenchmarkTab />
+          <TabsContent value="screenshots">
+            <Card className="border-border/80 bg-card/60 overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-sm font-display text-cyan-300 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" /> Скриншоты интерфейса b4
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">
+                  Последовательность экранов настройки целей, GeoSite/GeoIP и фильтрации доменов.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <img
+                  src="https://b4ytguide-abdxntke.manus.space/manus-storage/b4-discovery-screenshots_c352a515.jpg"
+                  alt="Скриншоты интерфейса b4: сеты, фильтрация доменов, категории GeoSite и GeoIP"
+                  className="block w-full h-auto rounded-lg border border-border/70"
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="troubleshoot">
@@ -188,26 +204,6 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </main>
-
-      <section className="container pb-8">
-        <Card className="border-cyan-500/20 bg-cyan-950/10">
-          <CardContent className="p-5 space-y-3">
-            <div className="flex items-center gap-2 text-cyan-300 font-mono text-xs">
-              <FileCode className="w-4 h-4" /> Полный аудит документации b4
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Инструкция сверена с русскоязычными разделами установки, настроек, сетов, TCP/UDP, DNS, Discovery, Watchdog, DPI Detector, Connections, маршрутизации, безопасности и бэкапа. Скорость Discovery и результаты стратегий не являются универсальными измерениями: подтверждайте их на своей линии.
-            </p>
-            <div className="flex flex-wrap gap-2 text-xs font-mono">
-              <a href="https://docs.b4core.app/ru/docs/install/openwrt/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">OpenWrt</a>
-              <a href="https://docs.b4core.app/ru/docs/discovery/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">Discovery</a>
-              <a href="https://docs.b4core.app/ru/docs/detector/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">DPI Detector</a>
-              <a href="https://docs.b4core.app/ru/docs/dns/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">DNS</a>
-              <a href="https://docs.b4core.app/ru/docs/settings/backup/" target="_blank" rel="noreferrer" className="text-cyan-300 hover:text-white">Backup</a>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
 
       {/* Footer */}
       <footer className="border-t border-border/80 py-6 bg-card/40 text-center text-xs text-muted-foreground font-mono">
