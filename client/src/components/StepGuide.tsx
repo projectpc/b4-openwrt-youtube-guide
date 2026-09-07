@@ -110,17 +110,13 @@ export function StepGuide() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-xs text-muted-foreground">Команды выполняются по SSH от имени <code>root</code>.</p>
-            <div className="relative bg-black/60 rounded-lg p-3 border border-border/80 font-mono text-[11px]">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="absolute right-2 top-2 h-6 px-2 text-xs text-cyan-400 hover:text-cyan-300"
-                onClick={() => copy("/etc/init.d/b4 enable     # автозапуск при загрузке\n/etc/init.d/b4 start\n/etc/init.d/b4 stop\n/etc/init.d/b4 restart\n/etc/init.d/b4 status\nlogread -e b4 | tail -50", "service-commands")}
-              >
-                {copiedId === "service-commands" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className="ml-1">Копировать</span>
+            <div className="flex justify-end">
+              <Button size="sm" variant="ghost" className="h-7 px-2 text-xs text-cyan-400 hover:text-cyan-300" onClick={() => copy("/etc/init.d/b4 enable     # автозапуск при загрузке\n/etc/init.d/b4 start\n/etc/init.d/b4 stop\n/etc/init.d/b4 restart\n/etc/init.d/b4 status\nlogread -e b4 | tail -50", "service-commands")}>
+                {copiedId === "service-commands" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать</span>
               </Button>
-              <pre className="text-cyan-300 leading-6 pr-24 overflow-x-auto">{`/etc/init.d/b4 enable     # автозапуск при загрузке
+            </div>
+            <div className="bg-black/60 rounded-lg p-3 border border-border/80 font-mono text-[11px]">
+              <pre className="text-cyan-300 leading-6 overflow-x-auto">{`/etc/init.d/b4 enable     # автозапуск при загрузке
 /etc/init.d/b4 start
 /etc/init.d/b4 stop
 /etc/init.d/b4 restart
@@ -160,18 +156,25 @@ logread -e b4 | tail -50`}</pre>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-xs text-red-100/85">Команда остановит и отключит службу, сохранит конфигурацию в <code>/root/b4-config-before-remove</code>, удалит службу, бинарники и каталоги конфигурации в обоих возможных местах.</p>
-          <div className="relative bg-black/70 rounded-lg p-3 border border-red-500/40 font-mono text-[11px]">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="absolute right-2 top-2 h-6 px-2 text-xs text-red-300 hover:text-red-200"
-              onClick={() => copy("mkdir -p /root/b4-config-before-remove && cp -a /etc/b4 /root/b4-config-before-remove/etc-b4 2>/dev/null || true; cp -a /opt/etc/b4 /root/b4-config-before-remove/opt-b4 2>/dev/null || true; /etc/init.d/b4 stop 2>/dev/null || true; /etc/init.d/b4 disable 2>/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2>/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check && /etc/init.d/firewall restart", "uninstall")}
-            >
-              {copiedId === "uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span className="ml-1">Копировать удаление</span>
+          <p className="text-xs text-red-100/85">Полное удаление останавливает и отключает службу, удаляет бинарники, конфигурацию и geodata. Перед выполнением убедитесь, что b4 больше не нужен.</p>
+          <div className="rounded-lg border border-red-500/40 bg-black/40 p-3">
+            <div className="flex items-center justify-between gap-3 text-red-200 font-bold text-xs">
+              <span>Способ 1 — официальный установщик</span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("./install.sh --remove --quiet", "remove-script")}>
+                {copiedId === "remove-script" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать</span>
+              </Button>
+            </div>
+            <p className="text-[11px] text-red-100/75 mt-1">Запустите из каталога, где находится <code>install.sh</code>. Ключи <code>--remove --quiet</code> удаляют каталог конфигурации и geodata без дополнительных вопросов.</p>
+            <pre className="text-red-200 text-[11px] leading-5 mt-2 overflow-x-auto">./install.sh --remove --quiet</pre>
+          </div>
+          <div className="mt-3 text-xs text-red-200 font-bold">Способ 2 — ручное удаление</div>
+          <div className="flex justify-end mt-2">
+            <Button size="sm" variant="ghost" className="h-7 px-2 text-xs text-red-300 hover:text-red-200" onClick={() => copy("/etc/init.d/b4 stop 2>/dev/null || true; /etc/init.d/b4 disable 2>/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2>/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check && /etc/init.d/firewall restart", "uninstall")}>
+              {copiedId === "uninstall" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать ручное удаление</span>
             </Button>
-            <pre className="text-red-200 leading-5 pr-32 overflow-x-auto">mkdir -p /root/b4-config-before-remove &amp;&amp; cp -a /etc/b4 /root/b4-config-before-remove/etc-b4 2&gt;/dev/null || true; cp -a /opt/etc/b4 /root/b4-config-before-remove/opt-b4 2&gt;/dev/null || true; /etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
+          </div>
+          <div className="bg-black/70 rounded-lg p-3 border border-red-500/40 font-mono text-[11px]">
+            <pre className="text-red-200 leading-5 overflow-x-auto">/etc/init.d/b4 stop 2&gt;/dev/null || true; /etc/init.d/b4 disable 2&gt;/dev/null || true; rm -f /etc/init.d/b4 /usr/bin/b4 /opt/bin/b4; rm -rf /etc/b4 /opt/etc/b4; nft delete table inet b4_mangle 2&gt;/dev/null || true; if [ -f /root/ruleset.uc.before-b4 ]; then cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc; fi; fw4 check &amp;&amp; /etc/init.d/firewall restart</pre>
           </div>
           <p className="text-[11px] text-red-100/75"><strong>Внимание:</strong> команда удаляет конфигурации b4. Если нужно сохранить настройки, заранее скопируйте <code>/etc/b4</code> и <code>/opt/etc/b4</code> на компьютер. Удаление b4 само по себе не откатывает patch flow offloading, если файла <code>/root/ruleset.uc.before-b4</code> нет.</p>
 
@@ -238,17 +241,13 @@ logread -e b4 | tail -50`}</pre>
               <AlertTriangle className="w-4 h-4" /> Откат — сохранить этот блок
             </div>
             <p className="text-[11px] text-red-100/80 mt-1">Если после патча пропал интернет, выросла нагрузка или b4 работает хуже, восстановите резервную копию и перезапустите firewall:</p>
-            <div className="relative mt-2 bg-black/70 rounded border border-red-500/40 p-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="absolute right-1 top-1 h-6 px-2 text-[11px] text-red-300 hover:text-red-200"
-                onClick={() => copy("cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart", "rollback")}
-              >
-                {copiedId === "rollback" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className="ml-1">Копировать откат</span>
+            <div className="mt-2 flex justify-end">
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px] text-red-300 hover:text-red-200" onClick={() => copy("cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart", "rollback")}>
+                {copiedId === "rollback" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}<span className="ml-1">Копировать откат</span>
               </Button>
-              <pre className="text-red-200 text-[11px] leading-5 pr-28 overflow-x-auto">cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart</pre>
+            </div>
+            <div className="mt-1 bg-black/70 rounded border border-red-500/40 p-2">
+              <pre className="text-red-200 text-[11px] leading-5 overflow-x-auto">cp -a /root/ruleset.uc.before-b4 /usr/share/firewall4/templates/ruleset.uc && fw4 check && /etc/init.d/firewall restart</pre>
             </div>
           </div>
         </div>
@@ -280,10 +279,12 @@ logread -e b4 | tail -50`}</pre>
             </div>
             <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
               <li>Перейдите во вкладку <strong>Discovery</strong></li>
-              <li>В поле введите: <code>youtube.com, googlevideo.com</code></li>
-              <li>Нажмите <strong>Start</strong> (занимает 1-3 минуты)</li>
+              <li>В поле введите: <code>googlevideo.com</code></li>
+              <li>Нажмите <strong>Start</strong> и дождитесь завершения Discovery</li>
               <li>После подтверждения нажмите <strong>Apply as a set</strong></li>
-              <li>Сет автоматически активируется на первом месте</li>
+              <li>Откройте созданный сет для редактирования</li>
+              <li>Во вкладке <strong>Targets</strong> выберите категорию GeoSite <code>youtube</code></li>
+              <li>Сет автоматически активируется на первом месте и охватит CDN видео и обложек</li>
             </ol>
           </Card>
 
@@ -294,8 +295,9 @@ logread -e b4 | tail -50`}</pre>
             <ol className="list-decimal list-inside space-y-1 text-muted-foreground font-mono">
               <li>Перейдите в <strong>Settings → Geodat</strong></li>
               <li>Выберите источник <strong>RUNET Freedom</strong> и нажмите <strong>Download</strong></li>
-              <li>В созданном сете YouTube во вкладке <strong>Targets</strong> выберите категорию GeoSite <code>youtube</code></li>
-              <li>Это автоматически защитит все CDN-сервера видео и обложек</li>
+              <li>Используйте этот вариант, если Discovery недоступен или нужен готовый набор GeoSite</li>
+              <li>В созданном сете во вкладке <strong>Targets</strong> выберите категорию GeoSite <code>youtube</code></li>
+              <li>Проверьте список целей и сохраните сет</li>
             </ol>
           </Card>
         </div>
